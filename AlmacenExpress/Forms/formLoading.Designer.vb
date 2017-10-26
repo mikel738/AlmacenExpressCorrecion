@@ -54,7 +54,7 @@ Partial Class formLoading
         '
         'pcCuatrovientosLogo
         '
-        Me.pcCuatrovientosLogo.Image = Global.AlmacenExpress.My.Resources.Resources.CuatrovientosLogo
+        ' Me.pcCuatrovientosLogo.Image = Global.AlmacenExpress.My.Resources.Resources.CuatrovientosLogo
         Me.pcCuatrovientosLogo.Location = New System.Drawing.Point(256, 433)
         Me.pcCuatrovientosLogo.Name = "pcCuatrovientosLogo"
         Me.pcCuatrovientosLogo.Size = New System.Drawing.Size(146, 68)

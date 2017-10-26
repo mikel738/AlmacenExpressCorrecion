@@ -17,6 +17,8 @@ Public Class formGame
     Private products As New List(Of Producto)
     Private productos() As String = {"boli", "calculadora", "taladradora", "goma", "pegamento", "subrayador", "papel", "lapiz", "tijera", "grapadora"}
     Private cantidad As New List(Of Producto)
+    Private imagenes() As Image = {My.Resources.Ball_Point_Pen_96, My.Resources.Calculator_96, My.Resources.Drill_96, My.Resources.Eraser_96, My.Resources.Glue_96, My.Resources.Marker_Pen_96, My.Resources.Paper_96, My.Resources.Pencil_96, My.Resources.Scissors_96, My.Resources.Stapler_96}
+    Private imagenesBN() As Image = {My.Resources.Ball_Point_Pen_96b, My.Resources.Calculator_96b, My.Resources.Drill_96b, My.Resources.Eraser_96b, My.Resources.Glue_96b, My.Resources.Marker_Pen_96b, My.Resources.Paper_96b, My.Resources.Pencil_96b, My.Resources.Scissors_96b, My.Resources.Stapler_96b}
     Private nombreImagenes() As String = {"Ball Point Pen-96.png", "Calculator-96.png", "Drill-96.png", "Eraser-96.png", "Glue-96.png", "Marker Pen-96.png", "Paper-96.png", "Pencil-96.png", "Scissors-96.png", "Stapler-96.png"}
     Private nombreImagenesBN() As String = {"Ball Point Pen-96b.png", "Calculator-96b.png", "Drill-96b.png", "Eraser-96b.png", "Glue-96b.png", "Marker Pen-96b.png", "Paper-96b.png", "Pencil-96b.png", "Scissors-96b.png", "Stapler-96b.png"}
     Private PuntosJugador As Integer = 0
@@ -32,12 +34,18 @@ Public Class formGame
     Private YaSalio As Boolean = False
     Private puntuacionUsuario As New Puntuacion
     Private pedidosYaSalidos As New List(Of Pedido)
+
+    Dim serie As Integer = 0
+    Dim puntos As Integer = 100
+    Dim usuarioActual As String = ""
+
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
+        'Que cierre la aplicacion y que en la base de datos actualice los datos de los usuarios (la puntuacion)
+        tratamiento.actualizarPuntuaciones(usuarioActual, puntos)
         Me.Close()
     End Sub
 
     Private Sub FormPrincipal_Load(sender As Object, e As EventArgs) Handles Me.Load
-
         PictureBoxFlechaRoja.Visible = False
         CrearPictureBox()
         DevolverPedido()
@@ -54,6 +62,7 @@ Public Class formGame
         For i = 0 To CantidadProductos.Count - 1
             CantidadProductos(i) = 50
         Next
+
     End Sub
 
     Private Sub formGame_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -74,7 +83,6 @@ Public Class formGame
         Else
             MetroMessageBox.Show(Me, "No hay usuarios", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
-
     End Sub
 
     Public Sub ActualizarPedidos()
@@ -86,7 +94,6 @@ Public Class formGame
             For Each pedido As Pedido In pedidos
                 lstPedidos.Items.Add(pedido)
             Next
-
         Else
             MetroMessageBox.Show(Me, "No hay pedidos", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
@@ -104,10 +111,10 @@ Public Class formGame
                         UsuarioCorrecto = False
                     End If
                 Next
-
                 If UsuarioCorrecto = True Then
                     MetroMessageBox.Show(Me, "Bienvenido " & txtUser.Text, "Hola", MessageBoxButtons.OK, MessageBoxIcon.Asterisk)
-
+                    'Nuevo para saber quien es el usuario
+                    usuarioActual = txtUser.Text
                     PanelOcultarJuegoInicio.Visible = False
                     For Each control As Control In pnlUserUI.Controls
                         control.Visible = False
@@ -120,24 +127,22 @@ Public Class formGame
                         tabControl.TabPages.Remove(TabAdminTools)
                     End If
 
-
-                    'Sacamos las puntuaciones del usuario
-                    puntuacionUsuario = tratamiento.DevolverPuntuaciones(txtUser.Text)
+                    ''''''FUNCION PARA LEER LOS PUNTOS QUE LLEVA
+                    Dim pun As New Puntuacion
+                    pun = tratamiento.cogerPuntuacionPersona(txtUser.Text)
                     Dim PuntosSeparados() As String
-                    Dim puntosUsuario As String = ""
-                    Dim puntosSplit As String = ""
-                    puntosUsuario = puntuacionUsuario.Puntuacion
-                    ' TODO Modificado por profes
-                    If puntosUsuario <> "" Then
-                        puntosSplit = puntosUsuario.Substring(0, puntosUsuario.Length - 1)
-                        PuntosSeparados = puntosSplit.Split(";")
-
-                        For i = 0 To PuntosSeparados.Length - 1
-                            ChartPuntuaciones.Series(0).Points.Add(PuntosSeparados(i))
-                        Next
-                        ChartPuntuaciones.Series(0).LegendText = "Puntuaciones"
-                    End If
-
+                    Dim num As Integer
+                    Dim numeros As New List(Of Integer)
+                    PuntosSeparados = pun.Puntuacion.Split(";")
+                    serie = PuntosSeparados.Count
+                    For i = 0 To PuntosSeparados.Count - 1
+                        Integer.TryParse(PuntosSeparados(i), num)
+                        numeros.Add(num)
+                    Next
+                    For i = 0 To numeros.Count - 2
+                        ChartPuntuaciones.Series(0).Points.Add(numeros(i))
+                    Next
+                    ChartPuntuaciones.Series(0).Points.Add(puntos)
                 Else
                     MetroMessageBox.Show(Me, "La contraseña no es correcta", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 End If
@@ -158,7 +163,6 @@ Public Class formGame
             End If
         End If
 
-
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles btnCrearCuenta.Click
@@ -167,6 +171,8 @@ Public Class formGame
         LabelRepetirContra.Visible = True
         txtRepetirContraseña.Visible = True
         btnAtras.Visible = True
+        txtUser.Text = ""
+        txtContraseña.Text = ""
     End Sub
 
     Private Sub MaterialFlatButton1_Click(sender As Object, e As EventArgs) Handles btnAtras.Click
@@ -175,6 +181,9 @@ Public Class formGame
         LabelRepetirContra.Visible = False
         txtRepetirContraseña.Visible = False
         btnLogIn_Registro.Text = "Iniciar sesión"
+        txtContraseña.Text = ""
+        txtRepetirContraseña.Text = ""
+        txtUser.Text = ""
     End Sub
 
     Private Sub lstPedidos_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lstPedidos.SelectedIndexChanged
@@ -195,7 +204,6 @@ Public Class formGame
         Else
             MetroMessageBox.Show(Me, "Selecciona primero un producto para eliminar", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
-
     End Sub
 
 
@@ -205,29 +213,24 @@ Public Class formGame
         Dim contador As Integer = 0
         For i = 0 To 9
             contador += 1
-
             Dim picture As New PictureBox
             picture.Height = 90
             picture.Width = 90
             picture.Location = New Point(posPictureAnchura, 30 + posPictureAltura)
-            picture.ImageLocation = ".\imagenes\" & nombreImagenes(i)
+            picture.Image = imagenes(i)
             picture.Name = productos(i)
             picture.Tag = nombreImagenes(i)
             posPictureAltura += 110
             picture.BackColor = Color.Transparent
             picture.Enabled = True
-
             If contador = 5 Then
                 posPictureAltura = 30
                 posPictureAnchura += 110
             End If
-
             tabGame.Controls.Add(picture)
-
             AddHandler picture.MouseDown, AddressOf imagenPresionada
             AddHandler picture.MouseMove, AddressOf imagenMoviendose
             AddHandler picture.MouseUp, AddressOf imagenSoltada
-
         Next
     End Sub
 
@@ -272,32 +275,10 @@ Public Class formGame
             picture.Enabled = False
             For i = 0 To nombreImagenes.Length - 1
                 If nombreImagenes(i) = picture.Tag Then
-                    picture.ImageLocation = ".\imagenes\" & nombreImagenesBN(i)
+                    picture.Image = imagenesBN(i)
+
                 End If
             Next
-
-            'For i = 0 To articulos.Count - 1
-            '    If articulos(i).ToLower = picture.Text.ToLower Then
-            '        If NumericCantidadProductos.Value <= CantidadProductos(i) Then
-            '            CantidadProductos(i) = CantidadProductos(i) - NumericCantidadProductos.Value
-            '        Else
-            '            MetroMessageBox.Show(Me, "La cantidad de productos que quieres comprar es demasiado alta, solo dispones de " & CantidadProductos(i) & " productos de ese tipo", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, 150)
-            '            picture.Location = coordenadasActuales
-            '            picture.BackColor = Color.LightGreen
-            '            Exit Sub
-            '        End If
-
-            '        Exit For
-            '    End If
-            'Next
-
-            'Dim controlesLabelsEliminar() As Control
-            'controlesLabelsEliminar = PanelJuego.Controls.Find("labelsCantidad", True)
-            'For Each control As Control In controlesLabelsEliminar
-            '    PanelJuego.Controls.Remove(control)
-            'Next
-            'crearLabelsCantidad()
-
 
             Dim p As New Button
             p.BackColor = Color.Gray
@@ -309,8 +290,6 @@ Public Class formGame
             p.ForeColor = Color.White
             p.Name = picture.Name
             p.ForeColor = Color.Red
-            'p.Image = picture.Image
-            'p.AutoSizeMode = PictureBoxSizeMode.StretchImage
             p.BackgroundImage = picture.Image
             p.BackgroundImageLayout = ImageLayout.Stretch
             p.Top = altura
@@ -325,7 +304,6 @@ Public Class formGame
 
             PanelProductos.Controls.Add(p)
             PanelProductos.SendToBack()
-            'PanelJuego.Controls.Remove(picture)
             distancia += 70
         Else
             picture.Location = coordenadasActuales
@@ -345,7 +323,7 @@ Public Class formGame
             Try
                 pedido = pedidos(random.Next(pedidos.Count))
             Catch ex As Exception
-                MsgBox("Ocurrio un errorcon los pedidos")
+                MsgBox("Ocurrio un error con los pedidos")
                 Exit Sub
             End Try
 
@@ -385,9 +363,6 @@ Public Class formGame
             tabGame.Controls.RemoveByKey(productos(i))
         Next
 
-        'For Each control As Control In picturesBorrar
-        '    PanelJuego.Controls.Remove(control)
-        'Next
         CrearPictureBox()
         altura = 5
         distancia = 10
@@ -407,8 +382,9 @@ Public Class formGame
         Dim vueltas As Integer = 0
 
 
-        If PanelProductos.Controls.Count = PanelPedidos.Controls.Count Then
+        If PanelProductos.Controls.Count = PanelPedidos.Controls.Count Then 'Comprueba que en el panel haya la misma cantidad de productos, no de cantidad de cada uno de ellos
             For i = 0 To PanelProductos.Controls.Count - 1
+                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
                 For j = 0 To PanelPedidos.Controls.Count - 1
                     productoComparar = PanelProductos.Controls(i).Name & ":" & PanelProductos.Controls(i).Text
                     If productoComparar.Equals(PanelPedidos.Controls(j).Text) Then
@@ -458,10 +434,16 @@ Public Class formGame
                 For i = 0 To CantidadProductosComparar.Count - 1
                     If CantidadProductosComparar(i) = CantidadProductosIntroducidos(i) Then
                         MetroMessageBox.Show(Me, "Has acertado el producto " & nombreProductos(i) & " te llevas 10 puntos", "Exito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        puntos += 10
+
                     Else
                         MetroMessageBox.Show(Me, "Has fallado el producto " & nombreProductos(i), "Fallo", MessageBoxButtons.OK, MessageBoxIcon.Error)
+
                     End If
                 Next
+                'Tenemos que actualizar la puntuacion del chabal
+                ChartPuntuaciones.Series(0).Points.Clear()
+                ChartPuntuaciones.Series(0).Points.Add(puntos)
 
                 'Actualizamos la cantidad de productos
                 Dim controlesEliminar() As Control
@@ -482,7 +464,8 @@ Public Class formGame
                 LimpiarControles()
             End If
         Else
-            MetroMessageBox.Show(Me, "La cantidad de productos introducidos no es la misma que la del pedido", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MetroMessageBox.Show(Me, "Los productos que has introducido no son los que pedimos, vuelve a intentarlo", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            'MetroMessageBox.Show(Me, "La cantidad de productos introducidos no es la misma que la del pedido", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             LimpiarControles()
         End If
     End Sub
@@ -508,7 +491,6 @@ Public Class formGame
             label.Height = grbProductosCantidad.Controls(i).Height
             grbProductosCantidad.Controls.Add(label)
         Next
-
     End Sub
 
     Private Sub btnMenosCantidad_Click(sender As Object, e As EventArgs) Handles btnMenosCantidad.Click
@@ -535,8 +517,10 @@ Public Class formGame
     End Sub
 
     Private Sub btnSumar10_Click(sender As Object, e As EventArgs) Handles btnSumar10.Click
-        If lblCantidadProductos.Text < 50 Then
+        If lblCantidadProductos.Text < 50 AndAlso lblCantidadProductos.Text + 10 <= 50 Then
             lblCantidadProductos.Text += 10
+        Else
+            MessageBox.Show("No puedes sobrepasar el máximo de productos")
         End If
     End Sub
 
@@ -544,11 +528,11 @@ Public Class formGame
         If ReproducirMusica = False Then
             My.Computer.Audio.Play(My.Resources.Zelda_Symphony_Orchestra___Great_Fairys_Fountain, AudioPlayMode.Background)
             ReproducirMusica = True
-            btnSonido.Image = My.Resources.Medium_Volume_30px
+            btnSonido.Icon = My.Resources.Medium_Volume_30px
         Else
             My.Computer.Audio.Stop()
             ReproducirMusica = False
-            btnSonido.Image = My.Resources.Mute_30px_2
+            btnSonido.Icon = My.Resources.Mute_30px_2
         End If
 
 
@@ -571,7 +555,7 @@ Public Class formGame
         grbAñadirPedido.Visible = True
         cboProductos.DisplayMember = "Nombre"
         cboProductos.DataSource = tratamiento.productos
-
+        'aer
     End Sub
 
     Private Sub btnAñadir_Click(sender As Object, e As EventArgs) Handles btnAñadir.Click
@@ -597,10 +581,18 @@ Public Class formGame
     Private Sub btnOtroPedido_Click(sender As Object, e As EventArgs) Handles btnReiniciar.Click
         pedidosYaSalidos.Clear()
         DevolverPedido()
+        PanelProductos.Controls.Clear()
+
+
+
     End Sub
 
     Private Sub btnReponer_Click(sender As Object, e As EventArgs) Handles btnReponer.Click
         ReponerProductosCantidad()
+    End Sub
+
+    Private Sub pnlBar_Paint(sender As Object, e As PaintEventArgs) Handles pnlBar.Paint
+
     End Sub
 End Class
 

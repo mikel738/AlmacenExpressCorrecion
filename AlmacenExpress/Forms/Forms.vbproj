@@ -165,52 +165,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\CuatrovientosLogo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\AlmacenExpress.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Icon.ico" />
-    <None Include="Resources\giphy.gif" />
-    <None Include="Resources\Circled User Male_104px.png" />
-    <None Include="Resources\Close Window_24px_1.png" />
-    <None Include="Resources\Invisible_30px1.png" />
-    <None Include="Resources\Visible_30px1.png" />
-    <None Include="Resources\flechaRoja.png" />
-    <None Include="Resources\Circled Chevron Down_30px.png" />
-    <None Include="Resources\Circled Chevron Up_30px.png" />
-    <None Include="Resources\Timezonemenos1030px.png" />
-    <None Include="Resources\Timezonemas1030px.png" />
-    <None Include="Resources\Zelda Symphony Orchestra - Great Fairys Fountain.wav" />
-    <None Include="Resources\Stapler-96b.png" />
-    <None Include="Resources\Stapler-96.png" />
-    <None Include="Resources\Scissors-96b.png" />
-    <None Include="Resources\Scissors-96.png" />
-    <None Include="Resources\Pencil-96b.png" />
-    <None Include="Resources\Pencil-96.png" />
-    <None Include="Resources\Paper-96b.png" />
-    <None Include="Resources\Paper-96.png" />
-    <None Include="Resources\Marker Pen-96b.png" />
-    <None Include="Resources\Marker Pen-96.png" />
-    <None Include="Resources\Glue-96b.png" />
-    <None Include="Resources\Glue-96.png" />
-    <None Include="Resources\Eraser-96b.png" />
-    <None Include="Resources\Eraser-96.png" />
-    <None Include="Resources\Drill-96b.png" />
-    <None Include="Resources\Drill-96.png" />
-    <None Include="Resources\Calculator-96b.png" />
-    <None Include="Resources\Calculator-96.png" />
-    <None Include="Resources\Ball Point Pen-96b.png" />
-    <None Include="Resources\Ball Point Pen-96.png" />
-    <None Include="Resources\Visible_30px.png" />
-    <None Include="Resources\Truck_30px_1.png" />
-    <None Include="Resources\Mute_30px_2.png" />
-    <None Include="Resources\Medium Volume_30px.png" />
-    <None Include="Resources\Invisible_30px.png" />
-    <None Include="Resources\Undo_30px.png" />
-    <None Include="Resources\MutedIcon.png" />
-    <None Include="Resources\CloseIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Classes\Classes.vbproj">
